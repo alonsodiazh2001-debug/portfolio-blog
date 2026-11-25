@@ -29,7 +29,7 @@ export const profile = {
   descripcionCorta:
     'Estudiante de Administración de Sistemas Informáticos en Red (ASIR) en el IES Alto Jarama. Enfocado en administración Linux/Windows Server, servicios de red, virtualización, cloud en AWS y ciberseguridad.',
   github: 'https://github.com/alonsodiazh2001-debug',
-  // Añade email o LinkedIn aquí cuando quieras hacerlos públicos:
+  // Contacto público opcional:
   email: '',
   linkedin: '',
   idiomas: [

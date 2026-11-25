@@ -1,28 +1,33 @@
 # Portfolio y Blog Técnico — Alonso Díaz
 
-Web personal minimalista en tema oscuro construida con **Astro** y **Tailwind CSS**, pensada para publicar en **Cloudflare Pages** de forma gratuita.
+Web personal y blog técnico desarrollado con **Astro** y **Tailwind CSS**, desplegado en **Cloudflare Pages**.
 
-## Comandos
+Reúne mi formación en **ASIR**, certificación en ciberseguridad, laboratorios de sistemas y redes, y guías prácticas paso a paso.
+
+## Stack
+
+- **Framework:** Astro 5
+- **Estilos:** Tailwind CSS v4
+- **Contenido del blog:** Markdown (Astro Content Collections)
+- **Despliegue:** Cloudflare Pages
+
+## Estructura principal
+
+```text
+src/
+├── components/   # Paleta de navegación rápida (Ctrl + K)
+├── content/blog/ # Artículos técnicos en Markdown
+├── data/         # Datos de perfil, formación, stack y proyectos
+├── layouts/      # Layout base
+├── pages/        # Inicio, /proyectos y /blog
+└── styles/       # Estilos globales
+```
+
+## Desarrollo local
 
 ```bash
 npm install
-npm run dev      # Servidor local en http://localhost:4321
+npm run dev      # http://localhost:4321
 npm run check    # Verificación de tipos TypeScript
-npm run build    # Genera el sitio estático en dist/
-npm run preview  # Previsualiza la build de producción
+npm run build    # Build estática en dist/
 ```
-
-## Cómo personalizar
-
-- **Perfil, formación, stack y proyectos:** edita [src/data/profile.ts](src/data/profile.ts).
-- **Artículos del blog:** añade archivos `.md` dentro de [src/content/blog/](src/content/blog/).
-- **Estilos globales y tema oscuro:** [src/styles/global.css](src/styles/global.css).
-
-## Publicación en Cloudflare Pages
-
-1. Sube este proyecto a un repositorio en GitHub.
-2. En **Cloudflare Dashboard → Workers & Pages → Create → Pages → Connect to Git**, selecciona tu repositorio.
-3. Configura:
-   - **Framework preset:** Astro
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`

@@ -51,5 +51,3 @@ Y realiza la consulta de prueba apuntando al servidor local:
 ```bash
 dig @192.168.50.10 web.asir.local +short
 ```
-
-> Puedes editar o añadir nuevos archivos `.md` dentro de `src/content/blog/` para publicar más guías de Windows Server, Docker, AWS o retos de Ciberseguridad.
