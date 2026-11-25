@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alonso Studio — Editor Local</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #09090b;
+        --panel: #111115;
+        --panel-2: #18181d;
+        --border: #27272a;
+        --text: #e4e4e7;
+        --muted: #a1a1aa;
+        --accent: #34d399;
+        --accent-bg: rgba(16, 185, 129, 0.14);
+        --danger: #f87171;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        border-bottom: 1px solid var(--border);
+        background: var(--panel);
+        padding: 12px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 15px;
+      }
+      .brand code {
+        color: var(--accent);
+        font-family: ui-monospace, monospace;
+      }
+      .tabs {
+        display: flex;
+        gap: 8px;
+      }
+      .btn {
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        color: var(--text);
+        padding: 7px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: 0.15s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn:hover { border-color: #3f3f46; }
+      .btn.active, .btn.primary {
+        border-color: rgba(52, 211, 153, 0.55);
+        background: var(--accent-bg);
+        color: #a7f3d0;
+        font-weight: 600;
+      }
+      .btn.publish {
+        background: #10b981;
+        border-color: #10b981;
+        color: #052e16;
+        font-weight: 700;
+      }
+      .btn.publish:hover { background: #34d399; }
+      .btn.danger {
+        border-color: rgba(248, 113, 113, 0.35);
+        color: var(--danger);
+      }
+      .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+      .git-bar {
+        border-bottom: 1px solid var(--border);
+        background: #0d0d11;
+        padding: 10px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .git-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .badge {
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+      }
+      .badge.pending {
+        border-color: rgba(251, 191, 36, 0.45);
+        color: #fde68a;
+      }
+      .badge.clean {
+        border-color: rgba(52, 211, 153, 0.35);
+        color: #6ee7b7;
+      }
+      .git-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      input[type="text"], input[type="date"], select, textarea {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 13px;
+        font-family: inherit;
+        outline: none;
+      }
+      input:focus, select:focus, textarea:focus {
+        border-color: rgba(52, 211, 153, 0.6);
+      }
+      main {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: 0;
+      }
+      @media (max-width: 900px) {
+        main { grid-template-columns: 1fr; }
+      }
+      aside {
+        border-right: 1px solid var(--border);
+        background: var(--panel);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        overflow-y: auto;
+        max-height: calc(100vh - 210px);
+      }
+      .list-item {
+        text-align: left;
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        color: var(--text);
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+      }
+      .list-item.selected {
+        border-color: rgba(52, 211, 153, 0.6);
+        background: var(--accent-bg);
+      }
+      .list-item .title { font-size: 13px; font-weight: 600; display: block; }
+      .list-item .meta { font-size: 11px; color: var(--muted); margin-top: 4px; display: block; font-family: ui-monospace, monospace; }
+      .workspace {
+        padding: 18px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        overflow-y: auto;
+      }
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+      .editor-split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        min-height: 360px;
+      }
+      @media (max-width: 1000px) { .editor-split { grid-template-columns: 1fr; } }
+      #post-body {
+        width: 100%;
+        min-height: 380px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.55;
+        resize: vertical;
+      }
+      .preview {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--panel);
+        padding: 14px 18px;
+        overflow-y: auto;
+        max-height: 520px;
+        line-height: 1.65;
+        font-size: 14px;
+      }
+      .preview h2, .preview h3 { color: #fafafa; margin-top: 1.1em; }
+      .preview pre { background: #09090b; border: 1px solid var(--border); padding: 10px; border-radius: 6px; overflow-x: auto; }
+      .preview code { color: #6ee7b7; font-family: ui-monospace, monospace; font-size: 0.9em; }
+      .preview pre code { color: #e4e4e7; }
+      .preview img { max-width: 100%; border-radius: 6px; border: 1px solid var(--border); margin: 8px 0; }
+      .preview blockquote { border-left: 2px solid var(--accent); padding-left: 10px; color: var(--muted); margin: 10px 0; }
+      .console {
+        border: 1px solid var(--border);
+        background: #050507;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-family: ui-monospace, monospace;
+        font-size: 12px;
+        color: #d4d4d8;
+        white-space: pre-wrap;
+        max-height: 160px;
+        overflow-y: auto;
+      }
+      .hidden { display: none !important; }
+      .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <code>&gt;_</code>
+        <span>Alonso Studio</span>
+        <span class="badge">Local</span>
+      </div>
+      <div class="tabs">
+        <button id="tab-blog" class="btn active" type="button">Blog / Guías</button>
+        <button id="tab-projects" class="btn" type="button">Proyectos</button>
+        <a href="https://alonsodiaz.pages.dev/" target="_blank" rel="noopener" class="btn">Ver web online ↗</a>
+      </div>
+    </header>
+
+    <div class="git-bar">
+      <div class="git-info">
+        <span id="git-badge" class="badge">Comprobando Git...</span>
+        <span id="git-last-commit"></span>
+      </div>
+      <div class="git-actions">
+        <input id="commit-msg" type="text" placeholder="Mensaje del cambio (ej: nueva guia de nmap)" style="width: 260px;" />
+        <button id="btn-build" class="btn" type="button">Probar Build</button>
+        <button id="btn-publish" class="btn publish" type="button">Subir a GitHub (Auto-Deploy)</button>
+      </div>
+    </div>
+
+    <main>
+      <aside>
+        <button id="btn-new-item" class="btn primary" type="button">+ Nueva entrada</button>
+        <div id="sidebar-list" class="list"></div>
+      </aside>
+
+      <section class="workspace">
+        <!-- Blog Editor -->
+        <div id="panel-blog">
+          <div class="row" style="justify-content: space-between; margin-bottom: 12px;">
+            <strong id="blog-mode-label">Nueva entrada</strong>
+            <div class="row">
+              <button id="btn-save-post" class="btn primary" type="button">Guardar entrada</button>
+              <button id="btn-delete-post" class="btn danger hidden" type="button">Eliminar</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <label>
+              Título
+              <input id="post-title" type="text" placeholder="Ej: Auditoría de puertos con Nmap" />
+            </label>
+            <label>
+              Slug (URL del artículo)
+              <input id="post-slug" type="text" placeholder="se-genera-automatico" />
+            </label>
+          </div>
+
+          <div class="grid-2" style="margin-top: 10px;">
+            <label>
+              Descripción corta
+              <input id="post-desc" type="text" placeholder="Resumen de 1 frase para la tarjeta del blog" />
+            </label>
+            <div class="grid-2">
+              <label>
+                Fecha
+                <input id="post-date" type="date" />
+              </label>
+              <label>
+                Tags (separados por comas)
+                <input id="post-tags" type="text" placeholder="Ciberseguridad, Nmap, Linux" />
+              </label>
+            </div>
+          </div>
+
+          <label style="flex-direction: row; align-items: center; gap: 8px; margin-top: 10px; color: var(--text);">
+            <input id="post-draft" type="checkbox" />
+            <span>Guardar como borrador (no se publica hasta desmarcarlo)</span>
+          </label>
+
+          <div class="toolbar" style="margin-top: 12px;">
+            <button class="btn" type="button" data-insert="## Título de sección&#10;&#10;">+ Título</button>
+            <button class="btn" type="button" data-insert="**texto en negrita**">Negrita</button>
+            <button class="btn" type="button" data-insert="```bash&#10;# comando aqui&#10;```&#10;">+ Código Bash</button>
+            <button class="btn" type="button" data-insert="> Nota importante&#10;">+ Nota</button>
+            <button id="btn-upload-trigger" class="btn" type="button">+ Subir captura</button>
+            <input id="image-file-input" type="file" accept=".png,.jpg,.jpeg,.webp,.gif" class="hidden" />
+          </div>
+
+          <div class="editor-split" style="margin-top: 10px;">
+            <textarea id="post-body" placeholder="Escribe tu guía en Markdown..."></textarea>
+            <div id="post-preview" class="preview"></div>
+          </div>
+        </div>
+
+        <!-- Projects Editor -->
+        <div id="panel-projects" class="hidden">
+          <div class="row" style="justify-content: space-between; margin-bottom: 12px;">
+            <strong id="proj-mode-label">Editar proyecto</strong>
+            <div class="row">
+              <button id="btn-save-proj" class="btn primary" type="button">Guardar proyecto</button>
+              <button id="btn-delete-proj" class="btn danger hidden" type="button">Eliminar</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <label>
+              Título del proyecto
+              <input id="proj-title" type="text" placeholder="Ej: Honeypot SSH en Docker" />
+            </label>
+            <label>
+              Categoría
+              <select id="proj-cat">
+                <option value="Ciberseguridad">Ciberseguridad</option>
+                <option value="Redes">Redes</option>
+                <option value="Sistemas">Sistemas</option>
+                <option value="Cloud y Docker">Cloud y Docker</option>
+                <option value="Web y BBDD">Web y BBDD</option>
+              </select>
+            </label>
+          </div>
+
+          <label style="margin-top: 10px;">
+            Resumen
+            <textarea id="proj-summary" rows="3" placeholder="Explica qué hiciste, qué herramientas usaste y qué resuelve."></textarea>
+          </label>
+
+          <div class="grid-2" style="margin-top: 10px;">
+            <label>
+              Tecnologías (separadas por comas)
+              <input id="proj-tech" type="text" placeholder="Docker, Wazuh, Linux" />
+            </label>
+            <label>
+              Enlace al repositorio (opcional)
+              <input id="proj-link" type="text" placeholder="https://github.com/alonsodiazh2001-debug/..." />
+            </label>
+          </div>
+
+          <label style="flex-direction: row; align-items: center; gap: 8px; margin-top: 10px; color: var(--text);">
+            <input id="proj-featured" type="checkbox" />
+            <span>Mostrar también como destacado en la portada</span>
+          </label>
+        </div>
+
+        <div id="console-box" class="console">Listo. Edita o crea contenido y pulsa "Subir a GitHub" cuando quieras publicarlo.</div>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        tab: 'blog',
+        posts: [],
+        selectedSlug: null,
+        projects: [],
+        selectedProjIndex: null,
+      };
+
+      const el = (id) => document.getElementById(id);
+      const logBox = el('console-box');
+
+      function log(msg) {
+        logBox.textContent = msg;
+      }
+
+      async function api(url, options = {}) {
+        const res = await fetch(url, {
+          headers: { 'Content-Type': 'application/json' },
+          ...options,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || data.output || 'Error');
+        return data;
+      }
+
+      function slugify(s) {
+        return String(s || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      }
+
+      function escapeHtml(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function renderMarkdownPreview(md) {
+        const lines = String(md || '').split('\n');
+        let html = '';
+        let inCode = false;
+        for (const line of lines) {
+          if (line.startsWith('```')) {
+            html += inCode ? '</code></pre>' : '<pre><code>';
+            inCode = !inCode;
+            continue;
+          }
+          if (inCode) {
+            html += escapeHtml(line) + '\n';
+            continue;
+          }
+          const img = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+          if (img) {
+            html += `<img src="${escapeHtml(img[2])}" alt="${escapeHtml(img[1])}" />`;
+          } else if (line.startsWith('### ')) {
+            html += `<h3>${escapeHtml(line.slice(4))}</h3>`;
+          } else if (line.startsWith('## ')) {
+            html += `<h2>${escapeHtml(line.slice(3))}</h2>`;
+          } else if (line.startsWith('> ')) {
+            html += `<blockquote>${escapeHtml(line.slice(2))}</blockquote>`;
+          } else if (line.trim() === '') {
+            html += '';
+          } else {
+            const formatted = escapeHtml(line)
+              .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+              .replace(/`([^`]+)`/g, '<code>$1</code>');
+            html += `<p>${formatted}</p>`;
+          }
+        }
+        if (inCode) html += '</code></pre>';
+        el('post-preview').innerHTML = html || '<p style="color:#71717a">Vista previa del artículo...</p>';
+      }
+
+      function renderSidebar() {
+        const list = el('sidebar-list');
+        list.innerHTML = '';
+
+        if (state.tab === 'blog') {
+          el('btn-new-item').textContent = '+ Nueva entrada de blog';
+          for (const post of state.posts) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `list-item ${state.selectedSlug === post.slug ? 'selected' : ''}`;
+            btn.innerHTML = `<span class="title">${escapeHtml(post.title)}</span><span class="meta">${post.pubDate}${post.draft ? ' · borrador' : ''}</span>`;
+            btn.onclick = () => selectPost(post.slug);
+            list.appendChild(btn);
+          }
+        } else {
+          el('btn-new-item').textContent = '+ Nuevo proyecto';
+          state.projects.forEach((proj, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `list-item ${state.selectedProjIndex === idx ? 'selected' : ''}`;
+            btn.innerHTML = `<span class="title">${escapeHtml(proj.titulo)}</span><span class="meta">${escapeHtml(proj.categoria)}</span>`;
+            btn.onclick = () => selectProject(idx);
+            list.appendChild(btn);
+          });
+        }
+      }
+
+      function clearPostForm() {
+        state.selectedSlug = null;
+        el('blog-mode-label').textContent = 'Nueva entrada';
+        el('post-title').value = '';
+        el('post-slug').value = '';
+        el('post-desc').value = '';
+        el('post-date').value = new Date().toISOString().slice(0, 10);
+        el('post-tags').value = '';
+        el('post-draft').checked = false;
+        el('post-body').value = '';
+        el('btn-delete-post').classList.add('hidden');
+        renderMarkdownPreview('');
+        renderSidebar();
+      }
+
+      function selectPost(slug) {
+        const post = state.posts.find((p) => p.slug === slug);
+        if (!post) return;
+        state.selectedSlug = slug;
+        el('blog-mode-label').textContent = `Editando: ${slug}.md`;
+        el('post-title').value = post.title || '';
+        el('post-slug').value = post.slug || '';
+        el('post-desc').value = post.description || '';
+        el('post-date').value = (post.pubDate || '').slice(0, 10);
+        el('post-tags').value = (post.tags || []).join(', ');
+        el('post-draft').checked = Boolean(post.draft);
+        el('post-body').value = post.body || '';
+        el('btn-delete-post').classList.remove('hidden');
+        renderMarkdownPreview(post.body || '');
+        renderSidebar();
+      }
+
+      function clearProjectForm() {
+        state.selectedProjIndex = null;
+        el('proj-mode-label').textContent = 'Nuevo proyecto';
+        el('proj-title').value = '';
+        el('proj-cat').value = 'Ciberseguridad';
+        el('proj-summary').value = '';
+        el('proj-tech').value = '';
+        el('proj-link').value = 'https://github.com/alonsodiazh2001-debug';
+        el('proj-featured').checked = true;
+        el('btn-delete-proj').classList.add('hidden');
+        renderSidebar();
+      }
+
+      function selectProject(idx) {
+        const proj = state.projects[idx];
+        if (!proj) return;
+        state.selectedProjIndex = idx;
+        el('proj-mode-label').textContent = `Editando proyecto #${idx + 1}`;
+        el('proj-title').value = proj.titulo || '';
+        el('proj-cat').value = proj.categoria || 'Ciberseguridad';
+        el('proj-summary').value = proj.resumen || '';
+        el('proj-tech').value = (proj.tecnologias || []).join(', ');
+        el('proj-link').value = proj.enlace || '';
+        el('proj-featured').checked = Boolean(proj.destacado);
+        el('btn-delete-proj').classList.remove('hidden');
+        renderSidebar();
+      }
+
+      async function refreshGit() {
+        try {
+          const data = await api('/api/git/status');
+          const badge = el('git-badge');
+          if (data.changes.length > 0) {
+            badge.textContent = `${data.changes.length} archivo(s) sin subir`;
+            badge.className = 'badge pending';
+          } else {
+            badge.textContent = 'Todo sincronizado';
+            badge.className = 'badge clean';
+          }
+          el('git-last-commit').textContent = `Último commit: ${data.lastCommit}`;
+        } catch (err) {
+          el('git-badge').textContent = 'Error Git';
+        }
+      }
+
+      async function loadAll() {
+        const [postsRes, projRes] = await Promise.all([api('/api/posts'), api('/api/projects')]);
+        state.posts = postsRes.posts;
+        state.projects = projRes.projects;
+        renderSidebar();
+        await refreshGit();
+      }
+
+      el('tab-blog').onclick = () => {
+        state.tab = 'blog';
+        el('tab-blog').classList.add('active');
+        el('tab-projects').classList.remove('active');
+        el('panel-blog').classList.remove('hidden');
+        el('panel-projects').classList.add('hidden');
+        renderSidebar();
+      };
+
+      el('tab-projects').onclick = () => {
+        state.tab = 'projects';
+        el('tab-projects').classList.add('active');
+        el('tab-blog').classList.remove('active');
+        el('panel-projects').classList.remove('hidden');
+        el('panel-blog').classList.add('hidden');
+        if (state.selectedProjIndex === null && state.projects.length) selectProject(0);
+        else renderSidebar();
+      };
+
+      el('btn-new-item').onclick = () => {
+        if (state.tab === 'blog') clearPostForm();
+        else clearProjectForm();
+      };
+
+      el('post-title').addEventListener('input', (e) => {
+        if (!state.selectedSlug) {
+          el('post-slug').value = slugify(e.target.value);
+        }
+      });
+
+      el('post-body').addEventListener('input', (e) => {
+        renderMarkdownPreview(e.target.value);
+      });
+
+      document.querySelectorAll('[data-insert]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const ta = el('post-body');
+          const start = ta.selectionStart;
+          const text = btn.getAttribute('data-insert');
+          ta.value = ta.value.slice(0, start) + text + ta.value.slice(ta.selectionEnd);
+          ta.focus();
+          renderMarkdownPreview(ta.value);
+        });
+      });
+
+      el('btn-upload-trigger').onclick = () => el('image-file-input').click();
+
+      el('image-file-input').addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const slug = el('post-slug').value.trim() || slugify(el('post-title').value) || 'general';
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try {
+            const res = await api('/api/upload-image', {
+              method: 'POST',
+              body: JSON.stringify({ slug, filename: file.name, dataBase64: reader.result }),
+            });
+            const ta = el('post-body');
+            const snippet = `\n![${file.name}](${res.path})\n`;
+            ta.value = ta.value.slice(0, ta.selectionStart) + snippet + ta.value.slice(ta.selectionEnd);
+            renderMarkdownPreview(ta.value);
+            log(`Imagen guardada en ${res.path}`);
+            await refreshGit();
+          } catch (err) {
+            log(`Error subiendo imagen: ${err.message}`);
+          }
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+      });
+
+      el('btn-save-post').onclick = async () => {
+        try {
+          const payload = {
+            title: el('post-title').value,
+            slug: el('post-slug').value,
+            description: el('post-desc').value,
+            pubDate: el('post-date').value,
+            tags: el('post-tags').value.split(',').map((t) => t.trim()).filter(Boolean),
+            draft: el('post-draft').checked,
+            body: el('post-body').value,
+          };
+          const res = await api('/api/posts', { method: 'POST', body: JSON.stringify(payload) });
+          await loadAll();
+          selectPost(res.slug);
+          el('commit-msg').value = `docs: ${payload.title}`;
+          log(`Guardado correctamente: src/content/blog/${res.slug}.md`);
+        } catch (err) {
+          log(`Error al guardar: ${err.message}`);
+        }
+      };
+
+      el('btn-delete-post').onclick = async () => {
+        if (!state.selectedSlug || !confirm(`¿Eliminar ${state.selectedSlug}.md?`)) return;
+        try {
+          await api(`/api/posts/${encodeURIComponent(state.selectedSlug)}`, { method: 'DELETE' });
+          await loadAll();
+          clearPostForm();
+          log('Entrada eliminada.');
+        } catch (err) {
+          log(`Error al eliminar: ${err.message}`);
+        }
+      };
+
+      el('btn-save-proj').onclick = async () => {
+        try {
+          const title = el('proj-title').value.trim();
+          if (!title) throw new Error('El título del proyecto es obligatorio.');
+          const item = {
+            titulo: title,
+            categoria: el('proj-cat').value,
+            destacado: el('proj-featured').checked,
+            resumen: el('proj-summary').value.trim(),
+            tecnologias: el('proj-tech').value.split(',').map((t) => t.trim()).filter(Boolean),
+          };
+          const link = el('proj-link').value.trim();
+          if (link) item.enlace = link;
+
+          const next = [...state.projects];
+          if (state.selectedProjIndex === null) {
+            next.unshift(item);
+            state.selectedProjIndex = 0;
+          } else {
+            next[state.selectedProjIndex] = item;
+          }
+          await api('/api/projects', { method: 'POST', body: JSON.stringify({ projects: next }) });
+          await loadAll();
+          selectProject(state.selectedProjIndex);
+          el('commit-msg').value = `feat: proyecto ${title}`;
+          log('Proyectos actualizados en src/data/proyectos.json');
+        } catch (err) {
+          log(`Error guardando proyecto: ${err.message}`);
+        }
+      };
+
+      el('btn-delete-proj').onclick = async () => {
+        if (state.selectedProjIndex === null || !confirm('¿Eliminar este proyecto?')) return;
+        try {
+          const next = state.projects.filter((_, i) => i !== state.selectedProjIndex);
+          await api('/api/projects', { method: 'POST', body: JSON.stringify({ projects: next }) });
+          await loadAll();
+          clearProjectForm();
+          log('Proyecto eliminado.');
+        } catch (err) {
+          log(`Error: ${err.message}`);
+        }
+      };
+
+      el('btn-build').onclick = async () => {
+        log('Compilando Astro (astro build)...');
+        try {
+          const res = await api('/api/build-check', { method: 'POST' });
+          log(`Build OK:\n${res.output}`);
+        } catch (err) {
+          log(`Error en build:\n${err.message}`);
+        }
+      };
+
+      el('btn-publish').onclick = async () => {
+        const btn = el('btn-publish');
+        btn.disabled = true;
+        log('Ejecutando git add, commit y push a GitHub...');
+        try {
+          const message = el('commit-msg').value.trim() || 'content: actualizar web';
+          const res = await api('/api/git/publish', {
+            method: 'POST',
+            body: JSON.stringify({ message }),
+          });
+          el('commit-msg').value = '';
+          log(`¡Subido a GitHub! Cloudflare actualizará https://alonsodiaz.pages.dev/ en ~1 min.\n\n${res.output}`);
+          await refreshGit();
+        } catch (err) {
+          log(`Error al subir a GitHub:\n${err.message}`);
+        } finally {
+          btn.disabled = false;
+        }
+      };
+
+      clearPostForm();
+      loadAll().catch((err) => log(`Error inicial: ${err.message}`));
+    </script>
+  </body>
+</html>

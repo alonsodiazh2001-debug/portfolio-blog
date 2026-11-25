@@ -1,0 +1,23 @@
+[
+  {
+    "titulo": "CFGS Administración de Sistemas Informáticos en Red (ASIR)",
+    "centro": "IES Alto Jarama",
+    "periodo": "Sep 2025 – Jul 2027",
+    "estado": "En curso",
+    "ubicacion": "Torrelaguna, Madrid",
+    "descripcion": "Administración avanzada de Windows Server y Linux, servicios de red e internet (DHCP, DNS, HTTP), virtualización y contenedores Docker, arquitectura en la nube, seguridad y alta disponibilidad, bases de datos e implantación de aplicaciones web."
+  },
+  {
+    "titulo": "Carrera Profesional de Analista Junior en Ciberseguridad",
+    "centro": "Cisco Networking Academy · IES Alto Jarama",
+    "periodo": "Nov 2026",
+    "estado": "Certificado",
+    "descripcion": "Formación práctica en análisis de vulnerabilidades, monitorización de redes, defensa de endpoints, gestión de amenazas y fundamentos de respuesta ante incidentes."
+  },
+  {
+    "titulo": "Computación e Informática",
+    "centro": "Instituto de Capacitación, Evaluación y Desarrollo Profesional",
+    "periodo": "Formación previa",
+    "descripcion": "Base sólida en fundamentos informáticos, herramientas ofimáticas y manejo técnico de sistemas."
+  }
+]

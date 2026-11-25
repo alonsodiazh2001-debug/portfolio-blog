@@ -8,6 +8,7 @@
     "build": "astro build",
     "check": "tsc --noEmit",
     "preview": "astro preview",
+    "studio": "node studio/server.mjs",
     "astro": "astro"
   },
   "dependencies": {
