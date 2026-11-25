@@ -59,6 +59,26 @@ const formatDate = (date: Date) =>
       >
         Leer guías
       </a>
+
+      {profile.linkedin && (
+        <a
+          href={profile.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-100"
+        >
+          LinkedIn ↗
+        </a>
+      )}
+
+      {profile.email && (
+        <a
+          href={`mailto:${profile.email}`}
+          class="inline-flex items-center rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-100"
+        >
+          Email
+        </a>
+      )}
     </div>
   </section>
 

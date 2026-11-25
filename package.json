@@ -17,6 +17,8 @@
     "tailwindcss": "^4.1.0"
   },
   "devDependencies": {
+    "mammoth": "^1.13.0",
+    "pdf-parse": "^1.1.1",
     "typescript": "^5.8.3"
   }
 }

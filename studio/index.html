@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Alonso Studio — Editor Local</title>
+    <title>Alonso Studio — Editor Visual</title>
     <style>
       :root {
         color-scheme: dark;
@@ -50,6 +50,7 @@
       }
       .tabs {
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
       }
       .btn {
@@ -66,7 +67,8 @@
         align-items: center;
         gap: 6px;
       }
-      .btn:hover { border-color: #3f3f46; }
+      .btn:hover { border-color: #3f3f46; background: #222229; }
+      .btn.sm { padding: 5px 9px; font-size: 12px; }
       .btn.active, .btn.primary {
         border-color: rgba(52, 211, 153, 0.55);
         background: var(--accent-bg);
@@ -97,8 +99,9 @@
       }
       .git-info {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         font-size: 12px;
         color: var(--muted);
       }
@@ -133,6 +136,7 @@
         font-size: 13px;
         font-family: inherit;
         outline: none;
+        width: 100%;
       }
       input:focus, select:focus, textarea:focus {
         border-color: rgba(52, 211, 153, 0.6);
@@ -140,7 +144,7 @@
       main {
         flex: 1;
         display: grid;
-        grid-template-columns: 280px 1fr;
+        grid-template-columns: 270px 1fr;
         min-height: 0;
       }
       @media (max-width: 900px) {
@@ -159,7 +163,7 @@
         flex-direction: column;
         gap: 6px;
         overflow-y: auto;
-        max-height: calc(100vh - 210px);
+        max-height: calc(100vh - 260px);
       }
       .list-item {
         text-align: left;
@@ -201,42 +205,122 @@
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        padding: 8px;
+        padding: 8px 10px;
         border: 1px solid var(--border);
         border-radius: 8px;
         background: var(--panel);
+        align-items: center;
       }
-      .editor-split {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        min-height: 360px;
+      .toolbar-sep {
+        width: 1px;
+        height: 22px;
+        background: var(--border);
+        margin: 0 2px;
       }
-      @media (max-width: 1000px) { .editor-split { grid-template-columns: 1fr; } }
-      #post-body {
+      .drop-hint {
+        font-size: 11px;
+        color: var(--muted);
+        margin-left: auto;
+      }
+
+      /* Visual WYSIWYG Editor */
+      .visual-editor {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #0d0d11;
+        padding: 20px 24px;
+        min-height: 420px;
+        max-height: 620px;
+        overflow-y: auto;
+        line-height: 1.75;
+        font-size: 15px;
+        color: #d4d4d8;
+        outline: none;
+      }
+      .visual-editor:focus { border-color: rgba(52, 211, 153, 0.55); }
+      .visual-editor.drag-over { border-color: var(--accent); background: rgba(16, 185, 129, 0.06); }
+      .visual-editor:empty::before {
+        content: attr(data-placeholder);
+        color: #71717a;
+        pointer-events: none;
+      }
+      .visual-editor h2 { color: #fafafa; font-size: 1.35rem; font-weight: 600; margin: 1.3em 0 0.45em; }
+      .visual-editor h3 { color: #f4f4f5; font-size: 1.12rem; font-weight: 600; margin: 1.1em 0 0.35em; }
+      .visual-editor p { margin: 0.65em 0; }
+      .visual-editor strong, .visual-editor b { color: #ffffff; font-weight: 700; }
+      .visual-editor ul, .visual-editor ol { padding-left: 1.45em; margin: 0.65em 0; }
+      .visual-editor li { margin: 0.25em 0; }
+      .visual-editor code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.88em;
+        background: #18181b;
+        border: 1px solid #27272a;
+        color: #6ee7b7;
+        padding: 0.12rem 0.35rem;
+        border-radius: 0.35rem;
+      }
+      .visual-editor pre {
+        background: #111114;
+        border: 1px solid #27272a;
+        border-radius: 0.65rem;
+        padding: 1rem 1.15rem;
+        overflow-x: auto;
+        margin: 1rem 0;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        color: #e4e4e7;
+        white-space: pre;
+      }
+      .visual-editor pre code { background: transparent; border: 0; padding: 0; color: inherit; font-size: inherit; }
+      .visual-editor blockquote { border-left: 2px solid var(--accent); padding-left: 1rem; color: var(--muted); margin: 1rem 0; }
+      .visual-editor a { color: var(--accent); text-decoration: underline; }
+      .visual-editor img { display: block; max-width: 100%; border-radius: 0.65rem; border: 1px solid #27272a; margin: 1rem 0; }
+      .visual-editor table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9em; }
+      .visual-editor th, .visual-editor td { border: 1px solid #27272a; padding: 0.5rem 0.7rem; text-align: left; }
+      .visual-editor th { background: #18181d; color: #fafafa; }
+      .visual-editor hr { border: 0; border-top: 1px solid #27272a; margin: 1.25rem 0; }
+
+      #raw-markdown-box {
         width: 100%;
-        min-height: 380px;
+        min-height: 420px;
         font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         font-size: 13px;
         line-height: 1.55;
         resize: vertical;
       }
-      .preview {
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--panel);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .gallery-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .gallery-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+      .thumb-card {
         border: 1px solid var(--border);
         border-radius: 8px;
-        background: var(--panel);
-        padding: 14px 18px;
-        overflow-y: auto;
-        max-height: 520px;
-        line-height: 1.65;
-        font-size: 14px;
+        background: var(--panel-2);
+        padding: 6px;
+        width: 136px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
       }
-      .preview h2, .preview h3 { color: #fafafa; margin-top: 1.1em; }
-      .preview pre { background: #09090b; border: 1px solid var(--border); padding: 10px; border-radius: 6px; overflow-x: auto; }
-      .preview code { color: #6ee7b7; font-family: ui-monospace, monospace; font-size: 0.9em; }
-      .preview pre code { color: #e4e4e7; }
-      .preview img { max-width: 100%; border-radius: 6px; border: 1px solid var(--border); margin: 8px 0; }
-      .preview blockquote { border-left: 2px solid var(--accent); padding-left: 10px; color: var(--muted); margin: 10px 0; }
+      .thumb-card img { width: 100%; height: 76px; object-fit: cover; border-radius: 4px; background: #09090b; }
+      .thumb-name { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: ui-monospace, monospace; }
+      .thumb-actions { display: flex; gap: 4px; }
       .console {
         border: 1px solid var(--border);
         background: #050507;
@@ -246,7 +330,7 @@
         font-size: 12px;
         color: #d4d4d8;
         white-space: pre-wrap;
-        max-height: 160px;
+        max-height: 150px;
         overflow-y: auto;
       }
       .hidden { display: none !important; }
@@ -258,30 +342,40 @@
       <div class="brand">
         <code>&gt;_</code>
         <span>Alonso Studio</span>
-        <span class="badge">Local</span>
+        <span class="badge">Editor Visual</span>
       </div>
       <div class="tabs">
         <button id="tab-blog" class="btn active" type="button">Blog / Guías</button>
         <button id="tab-projects" class="btn" type="button">Proyectos</button>
-        <a href="https://alonsodiaz.pages.dev/" target="_blank" rel="noopener" class="btn">Ver web online ↗</a>
+        <button id="tab-profile" class="btn" type="button">Perfil y Formación</button>
+        <button id="btn-preview-local" class="btn" type="button">Ver borrador local ↗</button>
+        <a href="https://alonsodiaz.pages.dev/" target="_blank" rel="noopener" class="btn">Web online ↗</a>
       </div>
     </header>
 
     <div class="git-bar">
       <div class="git-info">
         <span id="git-badge" class="badge">Comprobando Git...</span>
+        <span id="dirty-badge" class="badge pending hidden">Cambios sin guardar en editor</span>
         <span id="git-last-commit"></span>
       </div>
       <div class="git-actions">
-        <input id="commit-msg" type="text" placeholder="Mensaje del cambio (ej: nueva guia de nmap)" style="width: 260px;" />
+        <input id="commit-msg" type="text" placeholder="Mensaje del cambio (ej: nueva guia de nmap)" style="width: 240px;" />
+        <button id="btn-discard" class="btn sm danger hidden" type="button" title="Deshacer cambios locales no subidos">Descartar</button>
         <button id="btn-build" class="btn" type="button">Probar Build</button>
         <button id="btn-publish" class="btn publish" type="button">Subir a GitHub (Auto-Deploy)</button>
       </div>
     </div>
 
     <main>
-      <aside>
+      <aside id="sidebar">
         <button id="btn-new-item" class="btn primary" type="button">+ Nueva entrada</button>
+        <select id="template-select" class="btn sm" style="width:100%;">
+          <option value="blank">Plantilla: En blanco</option>
+          <option value="ctf">Plantilla: Writeup Ciberseguridad / CTF</option>
+          <option value="lab">Plantilla: Guía de Laboratorio ASIR</option>
+        </select>
+        <input id="sidebar-search" type="text" placeholder="Buscar por título o tag..." />
         <div id="sidebar-list" class="list"></div>
       </aside>
 
@@ -289,8 +383,14 @@
         <!-- Blog Editor -->
         <div id="panel-blog">
           <div class="row" style="justify-content: space-between; margin-bottom: 12px;">
-            <strong id="blog-mode-label">Nueva entrada</strong>
             <div class="row">
+              <strong id="blog-mode-label">Nueva entrada</strong>
+              <span id="reading-stats" class="badge">0 palabras · 1 min</span>
+            </div>
+            <div class="row">
+              <button id="btn-import-doc" class="btn sm primary" type="button">📄 Importar Word / PDF</button>
+              <input id="doc-file-input" type="file" accept=".docx,.pdf" class="hidden" />
+              <button id="btn-toggle-raw" class="btn sm" type="button">Ver Markdown</button>
               <button id="btn-save-post" class="btn primary" type="button">Guardar entrada</button>
               <button id="btn-delete-post" class="btn danger hidden" type="button">Eliminar</button>
             </div>
@@ -325,22 +425,55 @@
           </div>
 
           <label style="flex-direction: row; align-items: center; gap: 8px; margin-top: 10px; color: var(--text);">
-            <input id="post-draft" type="checkbox" />
+            <input id="post-draft" type="checkbox" style="width:auto;" />
             <span>Guardar como borrador (no se publica hasta desmarcarlo)</span>
           </label>
 
           <div class="toolbar" style="margin-top: 12px;">
-            <button class="btn" type="button" data-insert="## Título de sección&#10;&#10;">+ Título</button>
-            <button class="btn" type="button" data-insert="**texto en negrita**">Negrita</button>
-            <button class="btn" type="button" data-insert="```bash&#10;# comando aqui&#10;```&#10;">+ Código Bash</button>
-            <button class="btn" type="button" data-insert="> Nota importante&#10;">+ Nota</button>
-            <button id="btn-upload-trigger" class="btn" type="button">+ Subir captura</button>
-            <input id="image-file-input" type="file" accept=".png,.jpg,.jpeg,.webp,.gif" class="hidden" />
+            <button id="btn-p" class="btn sm" type="button">Normal</button>
+            <button id="btn-h2" class="btn sm" type="button">H2 Título</button>
+            <button id="btn-h3" class="btn sm" type="button">H3 Subtítulo</button>
+            <span class="toolbar-sep"></span>
+            <button id="btn-bold" class="btn sm" type="button" title="Negrita (Ctrl + B)"><strong>B</strong> Negrita</button>
+            <button id="btn-italic" class="btn sm" type="button" title="Cursiva (Ctrl + I)"><em>I</em> Cursiva</button>
+            <button id="btn-inline-code" class="btn sm" type="button"><code>&lt;/&gt;</code> Código</button>
+            <span class="toolbar-sep"></span>
+            <button id="btn-ul" class="btn sm" type="button">• Lista</button>
+            <button id="btn-ol" class="btn sm" type="button">1. Numerada</button>
+            <button id="btn-quote" class="btn sm" type="button">❝ Nota</button>
+            <button id="btn-link" class="btn sm" type="button">🔗 Enlace</button>
+            <button id="btn-table" class="btn sm" type="button">▦ Tabla</button>
+            <select id="code-lang" class="btn sm" style="width:auto; padding: 4px 8px;">
+              <option value="bash">bash</option>
+              <option value="json">json</option>
+              <option value="sql">sql</option>
+              <option value="yaml">yaml</option>
+              <option value="python">python</option>
+              <option value="text">texto</option>
+            </select>
+            <button id="btn-codeblock" class="btn sm" type="button">+ Bloque código</button>
+            <span class="toolbar-sep"></span>
+            <button id="btn-upload-trigger" class="btn sm primary" type="button">📷 Añadir foto</button>
+            <input id="image-file-input" type="file" accept=".png,.jpg,.jpeg,.webp,.gif" multiple class="hidden" />
+            <span class="drop-hint">Pega capturas (Ctrl+V) o arrastra fotos / .docx / .pdf</span>
           </div>
 
-          <div class="editor-split" style="margin-top: 10px;">
-            <textarea id="post-body" placeholder="Escribe tu guía en Markdown..."></textarea>
-            <div id="post-preview" class="preview"></div>
+          <div style="margin-top: 10px;">
+            <div
+              id="visual-editor"
+              class="visual-editor"
+              contenteditable="true"
+              data-placeholder="Empieza a escribir aquí directamente o pulsa '📄 Importar Word / PDF' arriba..."
+            ></div>
+            <textarea id="raw-markdown-box" class="hidden"></textarea>
+          </div>
+
+          <div class="card" style="margin-top: 10px;">
+            <div class="gallery-header">
+              <span>Fotos guardadas en este artículo (clic en Insertar para ponerla en el texto)</span>
+              <button id="btn-refresh-images" class="btn sm" type="button">Actualizar galería</button>
+            </div>
+            <div id="image-gallery" class="gallery-grid"></div>
           </div>
         </div>
 
@@ -388,29 +521,95 @@
           </div>
 
           <label style="flex-direction: row; align-items: center; gap: 8px; margin-top: 10px; color: var(--text);">
-            <input id="proj-featured" type="checkbox" />
+            <input id="proj-featured" type="checkbox" style="width:auto;" />
             <span>Mostrar también como destacado en la portada</span>
           </label>
         </div>
 
-        <div id="console-box" class="console">Listo. Edita o crea contenido y pulsa "Subir a GitHub" cuando quieras publicarlo.</div>
+        <!-- Profile, Education & Skills Editor -->
+        <div id="panel-profile" class="hidden">
+          <div class="row" style="justify-content: space-between; margin-bottom: 12px;">
+            <strong>Perfil, Formación y Stack Técnico</strong>
+            <button id="btn-save-profile" class="btn primary" type="button">Guardar Perfil y Formación</button>
+          </div>
+
+          <div class="card">
+            <strong style="font-size:13px;">Datos principales</strong>
+            <div class="grid-2">
+              <label>Nombre visible <input id="prof-nombre" type="text" /></label>
+              <label>Rol / Titular <input id="prof-rol" type="text" /></label>
+              <label>Estado actual <input id="prof-estado" type="text" /></label>
+              <label>Ubicación <input id="prof-ubicacion" type="text" /></label>
+            </div>
+            <label>
+              Descripción corta
+              <textarea id="prof-desc" rows="2"></textarea>
+            </label>
+            <div class="grid-2">
+              <label>GitHub URL <input id="prof-github" type="text" /></label>
+              <label>LinkedIn URL (opcional) <input id="prof-linkedin" type="text" placeholder="https://www.linkedin.com/in/..." /></label>
+              <label>Email público (opcional) <input id="prof-email" type="text" placeholder="tuemail@ejemplo.com" /></label>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 12px;">
+            <div class="row" style="justify-content: space-between;">
+              <strong style="font-size:13px;">Formación y Certificaciones</strong>
+              <button id="btn-add-edu" class="btn sm primary" type="button">+ Añadir título/certificado</button>
+            </div>
+            <div id="edu-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+
+          <div class="card" style="margin-top: 12px;">
+            <div class="row" style="justify-content: space-between;">
+              <strong style="font-size:13px;">Stack Técnico</strong>
+              <button id="btn-add-skill" class="btn sm primary" type="button">+ Añadir categoría</button>
+            </div>
+            <div id="skills-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+        </div>
+
+        <div id="console-box" class="console">Listo. Puedes escribir visualmente, importar Word (.docx) o PDF (.pdf) y subir todo a GitHub en un clic.</div>
       </section>
     </main>
 
     <script>
+      const TEMPLATES = {
+        blank: '',
+        ctf: `<h2>1. Información del reto / máquina</h2>\n<p><strong>Plataforma:</strong> Atenea / TryHackMe · <strong>Categoría:</strong> Web / Forense / Redes</p>\n<h2>2. Reconocimiento</h2>\n<p>Describe los puertos, servicios o archivos iniciales analizados:</p>\n<pre data-lang="bash"><code>nmap -sC -sV -oN escaneo.txt 10.10.10.10</code></pre>\n<h2>3. Análisis y explotación</h2>\n<p>Explica paso a paso cómo encontraste el fallo o la flag.</p>\n<h2>4. Mitigación</h2>\n<blockquote>Recomendaciones para corregir la vulnerabilidad en un entorno real.</blockquote>`,
+        lab: `<h2>1. Escenario y objetivo</h2>\n<p>Describe la topología, máquinas virtuales y direcciones IP del laboratorio.</p>\n<h2>2. Instalación y configuración</h2>\n<pre data-lang="bash"><code>sudo apt update</code></pre>\n<h2>3. Verificación y pruebas</h2>\n<p>Comandos o capturas que demuestran que el servicio funciona.</p>\n<h2>4. Problemas encontrados y solución</h2>\n<p>Anota los errores que surgieron y cómo los resolviste.</p>`,
+      };
+
       const state = {
         tab: 'blog',
         posts: [],
         selectedSlug: null,
         projects: [],
         selectedProjIndex: null,
+        profileData: null,
+        rawMode: false,
+        dirty: false,
       };
 
       const el = (id) => document.getElementById(id);
       const logBox = el('console-box');
+      const editor = el('visual-editor');
+      const rawBox = el('raw-markdown-box');
 
       function log(msg) {
         logBox.textContent = msg;
+      }
+
+      function setDirty(flag) {
+        state.dirty = flag;
+        el('dirty-badge').classList.toggle('hidden', !flag);
+      }
+
+      function updateReadingStats() {
+        const text = state.rawMode ? rawBox.value : (editor.innerText || '');
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const mins = Math.max(1, Math.ceil(words / 200));
+        el('reading-stats').textContent = `${words} palabras · ${mins} min`;
       }
 
       async function api(url, options = {}) {
@@ -432,63 +631,340 @@
           .replace(/^-+|-+$/g, '');
       }
 
-      function escapeHtml(s) {
-        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      function currentSlug() {
+        return el('post-slug').value.trim() || slugify(el('post-title').value) || 'general';
       }
 
-      function renderMarkdownPreview(md) {
-        const lines = String(md || '').split('\n');
+      function escapeHtml(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function formatInline(raw) {
+        return escapeHtml(raw)
+          .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+          .replace(/`([^`]+)`/g, '<code>$1</code>')
+          .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+      }
+
+      function markdownToHtml(md) {
+        const lines = String(md || '').replace(/\r\n/g, '\n').split('\n');
         let html = '';
         let inCode = false;
-        for (const line of lines) {
+        let codeLang = 'text';
+        let codeBuf = [];
+        let inUl = false;
+        let inOl = false;
+
+        const closeLists = () => {
+          if (inUl) { html += '</ul>'; inUl = false; }
+          if (inOl) { html += '</ol>'; inOl = false; }
+        };
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
           if (line.startsWith('```')) {
-            html += inCode ? '</code></pre>' : '<pre><code>';
-            inCode = !inCode;
+            closeLists();
+            if (!inCode) {
+              inCode = true;
+              codeLang = line.slice(3).trim() || 'text';
+              codeBuf = [];
+            } else {
+              html += `<pre data-lang="${escapeHtml(codeLang)}"><code>${escapeHtml(codeBuf.join('\n'))}</code></pre>`;
+              inCode = false;
+            }
             continue;
           }
           if (inCode) {
-            html += escapeHtml(line) + '\n';
+            codeBuf.push(line);
             continue;
           }
-          const img = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+
+          const img = line.trim().match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
           if (img) {
-            html += `<img src="${escapeHtml(img[2])}" alt="${escapeHtml(img[1])}" />`;
+            closeLists();
+            html += `<p><img src="${escapeHtml(img[2])}" alt="${escapeHtml(img[1])}" /></p>`;
           } else if (line.startsWith('### ')) {
-            html += `<h3>${escapeHtml(line.slice(4))}</h3>`;
+            closeLists();
+            html += `<h3>${formatInline(line.slice(4))}</h3>`;
           } else if (line.startsWith('## ')) {
-            html += `<h2>${escapeHtml(line.slice(3))}</h2>`;
+            closeLists();
+            html += `<h2>${formatInline(line.slice(3))}</h2>`;
           } else if (line.startsWith('> ')) {
-            html += `<blockquote>${escapeHtml(line.slice(2))}</blockquote>`;
+            closeLists();
+            html += `<blockquote>${formatInline(line.slice(2))}</blockquote>`;
+          } else if (/^[-*] /.test(line)) {
+            if (inOl) { html += '</ol>'; inOl = false; }
+            if (!inUl) { html += '<ul>'; inUl = true; }
+            html += `<li>${formatInline(line.slice(2))}</li>`;
+          } else if (/^\d+\. /.test(line)) {
+            if (inUl) { html += '</ul>'; inUl = false; }
+            if (!inOl) { html += '<ol>'; inOl = true; }
+            html += `<li>${formatInline(line.replace(/^\d+\. /, ''))}</li>`;
+          } else if (line.trim().startsWith('|') && line.trim().endsWith('|')) {
+            closeLists();
+            const cells = line.trim().slice(1, -1).split('|').map((c) => c.trim());
+            const isSep = cells.every((c) => /^:?-+:?$/.test(c));
+            if (!isSep) {
+              const nextIsSep = lines[i + 1] && lines[i + 1].trim().includes('---');
+              if (nextIsSep) {
+                html += `<table><thead><tr>${cells.map((c) => `<th>${formatInline(c)}</th>`).join('')}</tr></thead><tbody>`;
+              } else {
+                html += `<tr>${cells.map((c) => `<td>${formatInline(c)}</td>`).join('')}</tr>`;
+                if (!lines[i + 1] || !lines[i + 1].trim().startsWith('|')) {
+                  html += '</tbody></table>';
+                }
+              }
+            }
+          } else if (line.trim() === '---') {
+            closeLists();
+            html += '<hr />';
           } else if (line.trim() === '') {
-            html += '';
+            closeLists();
           } else {
-            const formatted = escapeHtml(line)
-              .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-              .replace(/`([^`]+)`/g, '<code>$1</code>');
-            html += `<p>${formatted}</p>`;
+            closeLists();
+            html += `<p>${formatInline(line)}</p>`;
           }
         }
-        if (inCode) html += '</code></pre>';
-        el('post-preview').innerHTML = html || '<p style="color:#71717a">Vista previa del artículo...</p>';
+        closeLists();
+        if (inCode) {
+          html += `<pre data-lang="${escapeHtml(codeLang)}"><code>${escapeHtml(codeBuf.join('\n'))}</code></pre>`;
+        }
+        return html;
+      }
+
+      function inlineNodesToMd(node) {
+        if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+        if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+        const tag = node.tagName.toLowerCase();
+        if (tag === 'br') return '\n';
+        if (tag === 'img') {
+          const src = node.getAttribute('src') || '';
+          const alt = node.getAttribute('alt') || 'Imagen';
+          return `![${alt}](${src})`;
+        }
+
+        const inner = Array.from(node.childNodes).map(inlineNodesToMd).join('');
+        if (tag === 'strong' || tag === 'b') {
+          const trimmed = inner.trim();
+          return trimmed ? `**${trimmed}**` : '';
+        }
+        if (tag === 'em' || tag === 'i') {
+          const trimmed = inner.trim();
+          return trimmed ? `*${trimmed}*` : '';
+        }
+        if (tag === 'code') return `\`${inner}\``;
+        if (tag === 'a') return `[${inner}](${node.getAttribute('href') || ''})`;
+        return inner;
+      }
+
+      function blockNodeToMd(node) {
+        if (node.nodeType === Node.TEXT_NODE) return (node.textContent || '').trim();
+        if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+        const tag = node.tagName.toLowerCase();
+        if (tag === 'h2' || tag === 'h1') return `## ${inlineNodesToMd(node).trim()}`;
+        if (tag === 'h3' || tag === 'h4') return `### ${inlineNodesToMd(node).trim()}`;
+        if (tag === 'hr') return '---';
+        if (tag === 'img') return inlineNodesToMd(node);
+
+        if (tag === 'pre') {
+          const lang = node.getAttribute('data-lang') || '';
+          const code = (node.innerText || node.textContent || '').replace(/\n+$/, '');
+          return `\`\`\`${lang}\n${code}\n\`\`\``;
+        }
+
+        if (tag === 'blockquote') {
+          const txt = Array.from(node.childNodes).map(inlineNodesToMd).join('').trim();
+          return txt.split('\n').map((l) => `> ${l}`).join('\n');
+        }
+
+        if (tag === 'ul') {
+          return Array.from(node.children)
+            .filter((c) => c.tagName.toLowerCase() === 'li')
+            .map((li) => `- ${inlineNodesToMd(li).trim()}`)
+            .join('\n');
+        }
+
+        if (tag === 'ol') {
+          return Array.from(node.children)
+            .filter((c) => c.tagName.toLowerCase() === 'li')
+            .map((li, idx) => `${idx + 1}. ${inlineNodesToMd(li).trim()}`)
+            .join('\n');
+        }
+
+        if (tag === 'table') {
+          const rows = Array.from(node.querySelectorAll('tr'));
+          if (!rows.length) return '';
+          const mdRows = rows.map((tr) => {
+            const cells = Array.from(tr.children).map((cell) => inlineNodesToMd(cell).trim());
+            return `| ${cells.join(' | ')} |`;
+          });
+          const colCount = rows[0].children.length || 1;
+          const sep = `| ${Array(colCount).fill(':---').join(' | ')} |`;
+          return [mdRows[0], sep, ...mdRows.slice(1)].join('\n');
+        }
+
+        return Array.from(node.childNodes).map(inlineNodesToMd).join('').trim();
+      }
+
+      function htmlToMarkdown(rootEl) {
+        const blocks = [];
+        for (const child of rootEl.childNodes) {
+          const md = blockNodeToMd(child);
+          if (md) blocks.push(md);
+        }
+        return blocks.join('\n\n').replace(/\n{3,}/g, '\n\n').trim();
+      }
+
+      function getCurrentMarkdown() {
+        return state.rawMode ? rawBox.value : htmlToMarkdown(editor);
+      }
+
+      function setEditorMarkdown(md) {
+        rawBox.value = md || '';
+        editor.innerHTML = markdownToHtml(md || '');
+        updateReadingStats();
+      }
+
+      function insertHtmlAtCursor(htmlStr) {
+        editor.focus();
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount || !editor.contains(sel.anchorNode)) {
+          editor.insertAdjacentHTML('beforeend', htmlStr);
+        } else {
+          document.execCommand('insertHTML', false, htmlStr);
+        }
+        setDirty(true);
+        updateReadingStats();
+      }
+
+      async function handleDocumentImport(file) {
+        if (state.dirty && !confirm('Tienes cambios sin guardar. ¿Reemplazar con el documento importado?')) return;
+        log(`Importando ${file.name}...`);
+        const dataBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error('No se pudo leer el documento.'));
+          reader.readAsDataURL(file);
+        });
+        const res = await api('/api/import-doc', {
+          method: 'POST',
+          body: JSON.stringify({
+            filename: file.name,
+            dataBase64,
+            slug: el('post-slug').value.trim() || undefined,
+          }),
+        });
+        if (!el('post-title').value.trim()) {
+          el('post-title').value = res.title;
+          el('post-slug').value = res.slug;
+        }
+        editor.innerHTML = res.html;
+        rawBox.value = htmlToMarkdown(editor);
+        setDirty(true);
+        updateReadingStats();
+        await loadImagesGallery();
+        await refreshGit();
+        log(`Documento importado (${res.imagesCount} imagen(es) extraídas). Revisa el contenido y pulsa "Guardar entrada".`);
+      }
+
+      async function uploadFileToPost(file, unique = false) {
+        const slug = currentSlug();
+        const dataBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error('No se pudo leer la imagen.'));
+          reader.readAsDataURL(file);
+        });
+        const res = await api('/api/upload-image', {
+          method: 'POST',
+          body: JSON.stringify({ slug, filename: file.name || 'captura.png', dataBase64, unique }),
+        });
+        const alt = escapeHtml((file.name || 'Captura').replace(/\.[^.]+$/, ''));
+        if (state.rawMode) {
+          const start = rawBox.selectionStart;
+          const snip = `\n![${alt}](${res.path})\n`;
+          rawBox.value = rawBox.value.slice(0, start) + snip + rawBox.value.slice(rawBox.selectionEnd);
+        } else {
+          insertHtmlAtCursor(`<p><img src="${escapeHtml(res.path)}" alt="${alt}" /></p><p><br></p>`);
+        }
+        setDirty(true);
+        log(`Foto añadida al artículo: ${res.path}`);
+        await Promise.all([loadImagesGallery(), refreshGit()]);
+      }
+
+      async function loadImagesGallery() {
+        const gallery = el('image-gallery');
+        try {
+          const res = await api(`/api/images?slug=${encodeURIComponent(currentSlug())}`);
+          if (!res.images.length) {
+            gallery.innerHTML = '<span style="font-size:12px;color:#71717a;">Aún no hay fotos en este artículo. Pulsa "📷 Añadir foto", pega con Ctrl+V o arrastra una imagen.</span>';
+            return;
+          }
+          gallery.innerHTML = '';
+          for (const img of res.images) {
+            const card = document.createElement('div');
+            card.className = 'thumb-card';
+            card.innerHTML = `
+              <img src="${escapeHtml(img.path)}" alt="${escapeHtml(img.filename)}" />
+              <span class="thumb-name" title="${escapeHtml(img.filename)}">${escapeHtml(img.filename)}</span>
+              <div class="thumb-actions">
+                <button class="btn sm primary" type="button" style="flex:1;justify-content:center;">Insertar</button>
+                <button class="btn sm danger" type="button" title="Borrar foto">✕</button>
+              </div>
+            `;
+            const [insertBtn, delBtn] = card.querySelectorAll('button');
+            insertBtn.onclick = () => {
+              const alt = escapeHtml(img.filename.replace(/\.[^.]+$/, ''));
+              if (state.rawMode) {
+                const start = rawBox.selectionStart;
+                const snip = `\n![${alt}](${img.path})\n`;
+                rawBox.value = rawBox.value.slice(0, start) + snip + rawBox.value.slice(rawBox.selectionEnd);
+              } else {
+                insertHtmlAtCursor(`<p><img src="${escapeHtml(img.path)}" alt="${alt}" /></p><p><br></p>`);
+              }
+            };
+            delBtn.onclick = async () => {
+              if (!confirm(`¿Borrar la foto ${img.filename}?`)) return;
+              await api(`/api/images/${encodeURIComponent(currentSlug())}/${encodeURIComponent(img.filename)}`, { method: 'DELETE' });
+              await Promise.all([loadImagesGallery(), refreshGit()]);
+            };
+            gallery.appendChild(card);
+          }
+        } catch {
+          gallery.innerHTML = '';
+        }
       }
 
       function renderSidebar() {
         const list = el('sidebar-list');
+        const q = el('sidebar-search').value.trim().toLowerCase();
         list.innerHTML = '';
 
         if (state.tab === 'blog') {
           el('btn-new-item').textContent = '+ Nueva entrada de blog';
-          for (const post of state.posts) {
+          el('template-select').classList.remove('hidden');
+          const filtered = state.posts.filter((p) =>
+            !q || p.title.toLowerCase().includes(q) || (p.tags || []).join(' ').toLowerCase().includes(q)
+          );
+          for (const post of filtered) {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = `list-item ${state.selectedSlug === post.slug ? 'selected' : ''}`;
             btn.innerHTML = `<span class="title">${escapeHtml(post.title)}</span><span class="meta">${post.pubDate}${post.draft ? ' · borrador' : ''}</span>`;
-            btn.onclick = () => selectPost(post.slug);
+            btn.onclick = () => {
+              if (state.dirty && !confirm('Tienes cambios sin guardar. ¿Cambiar de artículo?')) return;
+              selectPost(post.slug);
+            };
             list.appendChild(btn);
           }
-        } else {
+        } else if (state.tab === 'projects') {
           el('btn-new-item').textContent = '+ Nuevo proyecto';
+          el('template-select').classList.add('hidden');
           state.projects.forEach((proj, idx) => {
+            if (q && !proj.titulo.toLowerCase().includes(q) && !proj.categoria.toLowerCase().includes(q)) return;
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = `list-item ${state.selectedProjIndex === idx ? 'selected' : ''}`;
@@ -499,19 +975,22 @@
         }
       }
 
-      function clearPostForm() {
+      function clearPostForm(templateKey = 'blank') {
         state.selectedSlug = null;
         el('blog-mode-label').textContent = 'Nueva entrada';
         el('post-title').value = '';
         el('post-slug').value = '';
         el('post-desc').value = '';
         el('post-date').value = new Date().toISOString().slice(0, 10);
-        el('post-tags').value = '';
+        el('post-tags').value = templateKey === 'ctf' ? 'Ciberseguridad, CTF' : templateKey === 'lab' ? 'ASIR, Redes, Linux' : '';
         el('post-draft').checked = false;
-        el('post-body').value = '';
+        editor.innerHTML = TEMPLATES[templateKey] || '';
+        rawBox.value = htmlToMarkdown(editor);
         el('btn-delete-post').classList.add('hidden');
-        renderMarkdownPreview('');
+        setDirty(false);
+        updateReadingStats();
         renderSidebar();
+        loadImagesGallery();
       }
 
       function selectPost(slug) {
@@ -525,10 +1004,11 @@
         el('post-date').value = (post.pubDate || '').slice(0, 10);
         el('post-tags').value = (post.tags || []).join(', ');
         el('post-draft').checked = Boolean(post.draft);
-        el('post-body').value = post.body || '';
+        setEditorMarkdown(post.body || '');
         el('btn-delete-post').classList.remove('hidden');
-        renderMarkdownPreview(post.body || '');
+        setDirty(false);
         renderSidebar();
+        loadImagesGallery();
       }
 
       function clearProjectForm() {
@@ -559,6 +1039,77 @@
         renderSidebar();
       }
 
+      function renderProfileTab() {
+        if (!state.profileData) return;
+        const { profile, formacion, skillGroups } = state.profileData;
+        el('prof-nombre').value = profile.nombre || '';
+        el('prof-rol').value = profile.rol || '';
+        el('prof-estado').value = profile.estado || '';
+        el('prof-ubicacion').value = profile.ubicacion || '';
+        el('prof-desc').value = profile.descripcionCorta || '';
+        el('prof-github').value = profile.github || '';
+        el('prof-linkedin').value = profile.linkedin || '';
+        el('prof-email').value = profile.email || '';
+
+        const eduList = el('edu-list');
+        eduList.innerHTML = '';
+        formacion.forEach((item, idx) => {
+          const box = document.createElement('div');
+          box.className = 'card';
+          box.style.background = '#18181d';
+          box.innerHTML = `
+            <div class="grid-2">
+              <label>Título <input type="text" data-edu-field="titulo" value="${escapeHtml(item.titulo || '')}" /></label>
+              <label>Centro <input type="text" data-edu-field="centro" value="${escapeHtml(item.centro || '')}" /></label>
+              <label>Periodo <input type="text" data-edu-field="periodo" value="${escapeHtml(item.periodo || '')}" /></label>
+              <label>Estado (opcional) <input type="text" data-edu-field="estado" value="${escapeHtml(item.estado || '')}" /></label>
+            </div>
+            <label>Descripción <textarea rows="2" data-edu-field="descripcion">${escapeHtml(item.descripcion || '')}</textarea></label>
+            <div class="row" style="justify-content:flex-end;">
+              <button class="btn sm danger" type="button">Eliminar</button>
+            </div>
+          `;
+          box.querySelector('button').onclick = () => {
+            state.profileData.formacion.splice(idx, 1);
+            renderProfileTab();
+          };
+          box.querySelectorAll('[data-edu-field]').forEach((inp) => {
+            inp.addEventListener('input', () => {
+              state.profileData.formacion[idx][inp.dataset.eduField] = inp.value;
+            });
+          });
+          eduList.appendChild(box);
+        });
+
+        const skillsList = el('skills-list');
+        skillsList.innerHTML = '';
+        skillGroups.forEach((grp, idx) => {
+          const box = document.createElement('div');
+          box.className = 'card';
+          box.style.background = '#18181d';
+          box.innerHTML = `
+            <div class="grid-2">
+              <label>Categoría <input type="text" data-skill-cat value="${escapeHtml(grp.categoria || '')}" /></label>
+              <label>Herramientas (separadas por comas) <input type="text" data-skill-items value="${escapeHtml((grp.items || []).join(', '))}" /></label>
+            </div>
+            <div class="row" style="justify-content:flex-end;">
+              <button class="btn sm danger" type="button">Eliminar categoría</button>
+            </div>
+          `;
+          box.querySelector('button').onclick = () => {
+            state.profileData.skillGroups.splice(idx, 1);
+            renderProfileTab();
+          };
+          box.querySelector('[data-skill-cat]').addEventListener('input', (e) => {
+            state.profileData.skillGroups[idx].categoria = e.target.value;
+          });
+          box.querySelector('[data-skill-items]').addEventListener('input', (e) => {
+            state.profileData.skillGroups[idx].items = e.target.value.split(',').map((s) => s.trim()).filter(Boolean);
+          });
+          skillsList.appendChild(box);
+        });
+      }
+
       async function refreshGit() {
         try {
           const data = await api('/api/git/status');
@@ -566,94 +1117,191 @@
           if (data.changes.length > 0) {
             badge.textContent = `${data.changes.length} archivo(s) sin subir`;
             badge.className = 'badge pending';
+            el('btn-discard').classList.remove('hidden');
           } else {
             badge.textContent = 'Todo sincronizado';
             badge.className = 'badge clean';
+            el('btn-discard').classList.add('hidden');
           }
           el('git-last-commit').textContent = `Último commit: ${data.lastCommit}`;
-        } catch (err) {
+        } catch {
           el('git-badge').textContent = 'Error Git';
         }
       }
 
       async function loadAll() {
-        const [postsRes, projRes] = await Promise.all([api('/api/posts'), api('/api/projects')]);
+        const [postsRes, projRes, profRes] = await Promise.all([
+          api('/api/posts'),
+          api('/api/projects'),
+          api('/api/profile'),
+        ]);
         state.posts = postsRes.posts;
         state.projects = projRes.projects;
+        state.profileData = profRes;
         renderSidebar();
+        renderProfileTab();
         await refreshGit();
       }
 
-      el('tab-blog').onclick = () => {
-        state.tab = 'blog';
-        el('tab-blog').classList.add('active');
-        el('tab-projects').classList.remove('active');
-        el('panel-blog').classList.remove('hidden');
-        el('panel-projects').classList.add('hidden');
-        renderSidebar();
-      };
+      function switchTab(tab) {
+        state.tab = tab;
+        ['blog', 'projects', 'profile'].forEach((t) => {
+          el(`tab-${t}`).classList.toggle('active', t === tab);
+          el(`panel-${t}`).classList.toggle('hidden', t !== tab);
+        });
+        el('sidebar').classList.toggle('hidden', tab === 'profile');
+        if (tab === 'projects' && state.selectedProjIndex === null && state.projects.length) {
+          selectProject(0);
+        } else {
+          renderSidebar();
+        }
+      }
 
-      el('tab-projects').onclick = () => {
-        state.tab = 'projects';
-        el('tab-projects').classList.add('active');
-        el('tab-blog').classList.remove('active');
-        el('panel-projects').classList.remove('hidden');
-        el('panel-blog').classList.add('hidden');
-        if (state.selectedProjIndex === null && state.projects.length) selectProject(0);
-        else renderSidebar();
-      };
+      el('tab-blog').onclick = () => switchTab('blog');
+      el('tab-projects').onclick = () => switchTab('projects');
+      el('tab-profile').onclick = () => switchTab('profile');
+      el('sidebar-search').addEventListener('input', renderSidebar);
 
       el('btn-new-item').onclick = () => {
-        if (state.tab === 'blog') clearPostForm();
-        else clearProjectForm();
+        if (state.tab === 'blog') {
+          if (state.dirty && !confirm('Tienes cambios sin guardar. ¿Crear nueva entrada?')) return;
+          clearPostForm(el('template-select').value);
+        } else {
+          clearProjectForm();
+        }
+      };
+
+      el('btn-toggle-raw').onclick = () => {
+        if (!state.rawMode) {
+          rawBox.value = htmlToMarkdown(editor);
+          editor.classList.add('hidden');
+          rawBox.classList.remove('hidden');
+          el('btn-toggle-raw').textContent = 'Modo Visual';
+          state.rawMode = true;
+        } else {
+          editor.innerHTML = markdownToHtml(rawBox.value);
+          rawBox.classList.add('hidden');
+          editor.classList.remove('hidden');
+          el('btn-toggle-raw').textContent = 'Ver Markdown';
+          state.rawMode = false;
+        }
+        updateReadingStats();
       };
 
       el('post-title').addEventListener('input', (e) => {
-        if (!state.selectedSlug) {
-          el('post-slug').value = slugify(e.target.value);
+        setDirty(true);
+        if (!state.selectedSlug) el('post-slug').value = slugify(e.target.value);
+      });
+      ['post-slug', 'post-desc', 'post-date', 'post-tags', 'post-draft'].forEach((id) => {
+        el(id).addEventListener('input', () => setDirty(true));
+      });
+      el('post-slug').addEventListener('change', loadImagesGallery);
+      el('btn-refresh-images').onclick = loadImagesGallery;
+
+      editor.addEventListener('input', () => {
+        setDirty(true);
+        updateReadingStats();
+      });
+      rawBox.addEventListener('input', () => {
+        setDirty(true);
+        updateReadingStats();
+      });
+
+      // Importar Word / PDF
+      el('btn-import-doc').onclick = () => el('doc-file-input').click();
+      el('doc-file-input').addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+          await handleDocumentImport(file);
+        } catch (err) {
+          log(`Error importando documento: ${err.message}`);
+        }
+        e.target.value = '';
+      });
+
+      // Botones del editor visual
+      el('btn-p').onclick = () => { editor.focus(); document.execCommand('formatBlock', false, 'p'); setDirty(true); };
+      el('btn-h2').onclick = () => { editor.focus(); document.execCommand('formatBlock', false, 'h2'); setDirty(true); };
+      el('btn-h3').onclick = () => { editor.focus(); document.execCommand('formatBlock', false, 'h3'); setDirty(true); };
+      el('btn-bold').onclick = () => { editor.focus(); document.execCommand('bold', false); setDirty(true); };
+      el('btn-italic').onclick = () => { editor.focus(); document.execCommand('italic', false); setDirty(true); };
+      el('btn-ul').onclick = () => { editor.focus(); document.execCommand('insertUnorderedList', false); setDirty(true); };
+      el('btn-ol').onclick = () => { editor.focus(); document.execCommand('insertOrderedList', false); setDirty(true); };
+      el('btn-quote').onclick = () => { editor.focus(); document.execCommand('formatBlock', false, 'blockquote'); setDirty(true); };
+
+      el('btn-inline-code').onclick = () => {
+        editor.focus();
+        const sel = window.getSelection();
+        const txt = sel && sel.toString() ? sel.toString() : 'comando';
+        document.execCommand('insertHTML', false, `<code>${escapeHtml(txt)}</code>&nbsp;`);
+        setDirty(true);
+      };
+
+      el('btn-link').onclick = () => {
+        editor.focus();
+        const sel = window.getSelection();
+        const txt = (sel && sel.toString()) || 'Enlace';
+        const url = prompt('Pega la URL del enlace:', 'https://');
+        if (!url) return;
+        document.execCommand('insertHTML', false, `<a href="${escapeHtml(url)}" target="_blank">${escapeHtml(txt)}</a>`);
+        setDirty(true);
+      };
+
+      el('btn-table').onclick = () => {
+        insertHtmlAtCursor(
+          '<table><thead><tr><th>Columna 1</th><th>Columna 2</th></tr></thead><tbody><tr><td>Dato 1</td><td>Dato 2</td></tr></tbody></table><p><br></p>'
+        );
+      };
+
+      el('btn-codeblock').onclick = () => {
+        const lang = el('code-lang').value;
+        const sel = window.getSelection();
+        const txt = sel && sel.toString() ? sel.toString() : '# escribe tus comandos aquí';
+        insertHtmlAtCursor(`<pre data-lang="${escapeHtml(lang)}"><code>${escapeHtml(txt)}</code></pre><p><br></p>`);
+      };
+
+      // Subida de fotos
+      el('btn-upload-trigger').onclick = () => el('image-file-input').click();
+      el('image-file-input').addEventListener('change', async (e) => {
+        for (const file of Array.from(e.target.files || [])) {
+          try { await uploadFileToPost(file); } catch (err) { log(`Error subiendo imagen: ${err.message}`); }
+        }
+        e.target.value = '';
+      });
+
+      editor.addEventListener('paste', async (e) => {
+        const items = Array.from(e.clipboardData?.items || []);
+        const imageItem = items.find((item) => item.type.startsWith('image/'));
+        if (imageItem) {
+          e.preventDefault();
+          const file = imageItem.getAsFile();
+          if (file) {
+            try { await uploadFileToPost(file, true); } catch (err) { log(`Error pegando captura: ${err.message}`); }
+          }
+          return;
+        }
+        const sel = window.getSelection();
+        const inPre = sel?.anchorNode && (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement)?.closest('pre');
+        if (inPre) {
+          e.preventDefault();
+          document.execCommand('insertText', false, e.clipboardData?.getData('text/plain') || '');
         }
       });
 
-      el('post-body').addEventListener('input', (e) => {
-        renderMarkdownPreview(e.target.value);
-      });
-
-      document.querySelectorAll('[data-insert]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const ta = el('post-body');
-          const start = ta.selectionStart;
-          const text = btn.getAttribute('data-insert');
-          ta.value = ta.value.slice(0, start) + text + ta.value.slice(ta.selectionEnd);
-          ta.focus();
-          renderMarkdownPreview(ta.value);
-        });
-      });
-
-      el('btn-upload-trigger').onclick = () => el('image-file-input').click();
-
-      el('image-file-input').addEventListener('change', async (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const slug = el('post-slug').value.trim() || slugify(el('post-title').value) || 'general';
-        const reader = new FileReader();
-        reader.onload = async () => {
-          try {
-            const res = await api('/api/upload-image', {
-              method: 'POST',
-              body: JSON.stringify({ slug, filename: file.name, dataBase64: reader.result }),
-            });
-            const ta = el('post-body');
-            const snippet = `\n![${file.name}](${res.path})\n`;
-            ta.value = ta.value.slice(0, ta.selectionStart) + snippet + ta.value.slice(ta.selectionEnd);
-            renderMarkdownPreview(ta.value);
-            log(`Imagen guardada en ${res.path}`);
-            await refreshGit();
-          } catch (err) {
-            log(`Error subiendo imagen: ${err.message}`);
+      editor.addEventListener('dragover', (e) => { e.preventDefault(); editor.classList.add('drag-over'); });
+      editor.addEventListener('dragleave', () => editor.classList.remove('drag-over'));
+      editor.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        editor.classList.remove('drag-over');
+        for (const file of Array.from(e.dataTransfer?.files || [])) {
+          const lower = file.name.toLowerCase();
+          if (lower.endsWith('.docx') || lower.endsWith('.pdf')) {
+            try { await handleDocumentImport(file); } catch (err) { log(`Error importando: ${err.message}`); }
+          } else if (file.type.startsWith('image/')) {
+            try { await uploadFileToPost(file); } catch (err) { log(`Error soltando imagen: ${err.message}`); }
           }
-        };
-        reader.readAsDataURL(file);
-        e.target.value = '';
+        }
       });
 
       el('btn-save-post').onclick = async () => {
@@ -665,9 +1313,10 @@
             pubDate: el('post-date').value,
             tags: el('post-tags').value.split(',').map((t) => t.trim()).filter(Boolean),
             draft: el('post-draft').checked,
-            body: el('post-body').value,
+            body: getCurrentMarkdown(),
           };
           const res = await api('/api/posts', { method: 'POST', body: JSON.stringify(payload) });
+          setDirty(false);
           await loadAll();
           selectPost(res.slug);
           el('commit-msg').value = `docs: ${payload.title}`;
@@ -681,6 +1330,7 @@
         if (!state.selectedSlug || !confirm(`¿Eliminar ${state.selectedSlug}.md?`)) return;
         try {
           await api(`/api/posts/${encodeURIComponent(state.selectedSlug)}`, { method: 'DELETE' });
+          setDirty(false);
           await loadAll();
           clearPostForm();
           log('Entrada eliminada.');
@@ -733,6 +1383,69 @@
         }
       };
 
+      // Perfil y Formación
+      el('btn-add-edu').onclick = () => {
+        state.profileData.formacion.unshift({
+          titulo: 'Nuevo curso o certificado',
+          centro: '',
+          periodo: '2026',
+          estado: '',
+          descripcion: '',
+        });
+        renderProfileTab();
+      };
+
+      el('btn-add-skill').onclick = () => {
+        state.profileData.skillGroups.push({ categoria: 'Nueva categoría', items: [] });
+        renderProfileTab();
+      };
+
+      el('btn-save-profile').onclick = async () => {
+        try {
+          const p = state.profileData.profile;
+          p.nombre = el('prof-nombre').value.trim();
+          p.rol = el('prof-rol').value.trim();
+          p.estado = el('prof-estado').value.trim();
+          p.ubicacion = el('prof-ubicacion').value.trim();
+          p.descripcionCorta = el('prof-desc').value.trim();
+          p.github = el('prof-github').value.trim();
+          p.linkedin = el('prof-linkedin').value.trim();
+          p.email = el('prof-email').value.trim();
+
+          await api('/api/profile', { method: 'POST', body: JSON.stringify(state.profileData) });
+          await refreshGit();
+          el('commit-msg').value = 'feat: actualizar perfil y formacion';
+          log('Perfil, formación y stack guardados en src/data/.');
+        } catch (err) {
+          log(`Error guardando perfil: ${err.message}`);
+        }
+      };
+
+      // Vista previa local integrada
+      el('btn-preview-local').onclick = async () => {
+        log('Abriendo vista previa local de la web...');
+        try {
+          const res = await api('/api/preview/start', { method: 'POST' });
+          const pathSuffix = state.tab === 'blog' && state.selectedSlug ? `/blog/${state.selectedSlug}` : '';
+          window.open(`${res.url}${pathSuffix}`, '_blank');
+          log(`Vista previa local lista en ${res.url}${pathSuffix}`);
+        } catch (err) {
+          log(`Error abriendo vista previa: ${err.message}`);
+        }
+      };
+
+      el('btn-discard').onclick = async () => {
+        if (!confirm('¿Descartar modificaciones en archivos existentes que aún no has subido a GitHub?')) return;
+        try {
+          await api('/api/git/discard', { method: 'POST' });
+          setDirty(false);
+          await loadAll();
+          log('Cambios en archivos existentes descartados.');
+        } catch (err) {
+          log(`Error descartando cambios: ${err.message}`);
+        }
+      };
+
       el('btn-build').onclick = async () => {
         log('Compilando Astro (astro build)...');
         try {
@@ -762,6 +1475,13 @@
           btn.disabled = false;
         }
       };
+
+      window.addEventListener('beforeunload', (e) => {
+        if (state.dirty) {
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      });
 
       clearPostForm();
       loadAll().catch((err) => log(`Error inicial: ${err.message}`));
