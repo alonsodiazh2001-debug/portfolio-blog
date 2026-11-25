@@ -1,0 +1,52 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { profile } from '../../data/profile';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout title={`${post.data.title} · ${profile.nombre}`} description={post.data.description}>
+  <article class="space-y-8">
+    <header class="space-y-4 border-b border-zinc-800/80 pb-6">
+      <a href="/blog" class="inline-flex items-center text-xs font-medium text-emerald-400 transition hover:text-emerald-300">
+        ← Volver al blog
+      </a>
+
+      <h1 class="text-2xl font-bold tracking-tight text-zinc-50 sm:text-3xl">
+        {post.data.title}
+      </h1>
+
+      <div class="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
+        <time datetime={post.data.pubDate.toISOString()} class="font-mono">
+          {formatDate(post.data.pubDate)}
+        </time>
+        {post.data.tags.length > 0 && (
+          <div class="flex flex-wrap gap-1.5">
+            {post.data.tags.map((tag) => (
+              <span class="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-0.5 font-mono text-[11px] text-zinc-300">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <div class="prose-dark">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

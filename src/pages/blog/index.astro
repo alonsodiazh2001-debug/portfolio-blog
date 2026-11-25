@@ -1,0 +1,54 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { profile } from '../../data/profile';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<BaseLayout
+  title={`Blog técnico · ${profile.nombre}`}
+  description="Guías prácticas, apuntes de redes, Linux, Windows Server, Docker, AWS y ciberseguridad."
+>
+  <section class="space-y-3">
+    <h1 class="text-2xl font-bold tracking-tight text-zinc-50 sm:text-3xl">
+      Blog técnico y guías
+    </h1>
+    <p class="text-sm leading-relaxed text-zinc-400 sm:text-base">
+      Apuntes paso a paso sobre administración de sistemas, servicios de red, virtualización y ciberseguridad.
+    </p>
+  </section>
+
+  <div class="mt-8 space-y-4">
+    {posts.map((post) => (
+      <a
+        href={`/blog/${post.id}`}
+        class="block rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-5 transition hover:border-zinc-700 hover:bg-zinc-900/70"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-base font-medium text-zinc-100 sm:text-lg">{post.data.title}</h2>
+          <time datetime={post.data.pubDate.toISOString()} class="font-mono text-xs text-zinc-500">
+            {formatDate(post.data.pubDate)}
+          </time>
+        </div>
+
+        <p class="mt-2 text-sm leading-relaxed text-zinc-400">{post.data.description}</p>
+
+        {post.data.tags.length > 0 && (
+          <ul class="mt-4 flex flex-wrap gap-1.5">
+            {post.data.tags.map((tag) => (
+              <li class="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-0.5 font-mono text-[11px] text-zinc-300">
+                #{tag}
+              </li>
+            ))}
+          </ul>
+        )}
+      </a>
+    ))}
+  </div>
+</BaseLayout>

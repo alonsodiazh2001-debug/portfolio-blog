@@ -1,0 +1,134 @@
+---
+import { getCollection } from 'astro:content';
+import { profile } from '../data/profile';
+
+interface PaletteItem {
+  label: string;
+  section: string;
+  href: string;
+  external?: boolean;
+}
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const items: PaletteItem[] = [
+  { label: 'Inicio', section: 'Navegación', href: '/' },
+  { label: 'Proyectos y laboratorios', section: 'Navegación', href: '/proyectos' },
+  { label: 'Blog técnico', section: 'Navegación', href: '/blog' },
+  { label: 'Formación y certificaciones', section: 'Secciones', href: '/#formacion' },
+  { label: 'Stack técnico', section: 'Secciones', href: '/#stack' },
+  { label: 'GitHub', section: 'Enlaces', href: profile.github, external: true },
+  ...posts.map((post) => ({
+    label: post.data.title,
+    section: 'Artículos',
+    href: `/blog/${post.id}`,
+  })),
+];
+---
+
+<div
+  id="cmd-palette"
+  class="fixed inset-0 z-50 hidden items-start justify-center bg-black/75 px-4 pt-24 backdrop-blur-xs"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Paleta de comandos"
+>
+  <div class="w-full max-w-lg overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 shadow-2xl">
+    <div class="flex items-center gap-3 border-b border-zinc-800 px-4 py-3">
+      <svg class="h-4 w-4 shrink-0 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+      <input
+        id="cmd-input"
+        type="text"
+        placeholder="Buscar páginas, secciones o artículos..."
+        class="w-full bg-transparent text-sm text-zinc-100 placeholder-zinc-500 outline-none"
+        autocomplete="off"
+      />
+      <kbd class="rounded border border-zinc-700 bg-zinc-800 px-1.5 py-0.5 text-[11px] text-zinc-400">ESC</kbd>
+    </div>
+
+    <ul id="cmd-list" class="max-h-72 overflow-y-auto p-2">
+      {items.map((item) => (
+        <li data-label={item.label.toLowerCase()} data-section={item.section.toLowerCase()}>
+          <a
+            href={item.href}
+            target={item.external ? '_blank' : undefined}
+            rel={item.external ? 'noopener noreferrer' : undefined}
+            class="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-zinc-300 transition hover:bg-zinc-800 hover:text-zinc-50"
+          >
+            <span class="truncate">{item.label}</span>
+            <span class="ml-3 shrink-0 text-xs text-zinc-500">{item.section}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p id="cmd-empty" class="hidden px-4 py-6 text-center text-sm text-zinc-500">
+      No hay coincidencias.
+    </p>
+  </div>
+</div>
+
+<script is:inline>
+  (() => {
+    const palette = document.getElementById('cmd-palette');
+    const input = document.getElementById('cmd-input');
+    const list = document.getElementById('cmd-list');
+    const empty = document.getElementById('cmd-empty');
+    const openBtn = document.getElementById('cmd-open-btn');
+    if (!palette || !input || !list || !empty) return;
+
+    const items = Array.from(list.querySelectorAll('li'));
+
+    const openPalette = () => {
+      palette.classList.remove('hidden');
+      palette.classList.add('flex');
+      input.value = '';
+      filterItems('');
+      requestAnimationFrame(() => input.focus());
+    };
+
+    const closePalette = () => {
+      palette.classList.add('hidden');
+      palette.classList.remove('flex');
+    };
+
+    const filterItems = (query) => {
+      const q = query.trim().toLowerCase();
+      let visible = 0;
+      for (const li of items) {
+        const match =
+          !q ||
+          (li.dataset.label || '').includes(q) ||
+          (li.dataset.section || '').includes(q);
+        li.classList.toggle('hidden', !match);
+        if (match) visible += 1;
+      }
+      empty.classList.toggle('hidden', visible > 0);
+    };
+
+    openBtn?.addEventListener('click', openPalette);
+
+    palette.addEventListener('click', (e) => {
+      if (e.target === palette) closePalette();
+    });
+
+    input.addEventListener('input', (e) => {
+      filterItems(e.target.value);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (palette.classList.contains('hidden')) openPalette();
+        else closePalette();
+      } else if (e.key === 'Escape' && !palette.classList.contains('hidden')) {
+        closePalette();
+      }
+    });
+  })();
+</script>

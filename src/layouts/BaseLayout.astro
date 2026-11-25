@@ -1,0 +1,97 @@
+---
+import '../styles/global.css';
+import CommandPalette from '../components/CommandPalette.astro';
+import { profile } from '../data/profile';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${profile.nombre} — Portfolio & Blog Técnico`,
+  description = profile.descripcionCorta,
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+const navLinks = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Proyectos', href: '/proyectos' },
+  { label: 'Blog', href: '/blog' },
+];
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+    <div class="mx-auto flex min-h-screen max-w-3xl flex-col px-6">
+      <header class="flex items-center justify-between border-b border-zinc-800/80 py-6">
+        <a href="/" class="flex items-center gap-2.5 text-sm font-semibold tracking-tight text-zinc-100 hover:text-emerald-400 transition">
+          <span class="font-mono text-emerald-400">&gt;_</span>
+          <span>{profile.nombre}</span>
+        </a>
+
+        <nav class="flex items-center gap-5 text-sm">
+          {navLinks.map((link) => {
+            const active =
+              link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+            return (
+              <a
+                href={link.href}
+                class:list={[
+                  'transition',
+                  active ? 'text-emerald-400 font-medium' : 'text-zinc-400 hover:text-zinc-100',
+                ]}
+              >
+                {link.label}
+              </a>
+            );
+          })}
+
+          <button
+            id="cmd-open-btn"
+            type="button"
+            title="Buscar (Ctrl + K)"
+            class="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200 cursor-pointer"
+          >
+            <span>Buscar</span>
+            <kbd class="font-mono text-[10px] text-zinc-500">Ctrl K</kbd>
+          </button>
+        </nav>
+      </header>
+
+      <main class="flex-1 py-12">
+        <slot />
+      </main>
+
+      <footer class="flex flex-col gap-3 border-t border-zinc-800/80 py-8 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
+        <p>© {new Date().getFullYear()} {profile.nombre} · Hecho con Astro y Tailwind CSS</p>
+        <div class="flex items-center gap-4">
+          <a
+            href={profile.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-zinc-400 transition hover:text-emerald-400"
+          >
+            GitHub
+          </a>
+          <a href="/blog" class="text-zinc-400 transition hover:text-emerald-400">
+            Blog
+          </a>
+          <a href="/proyectos" class="text-zinc-400 transition hover:text-emerald-400">
+            Proyectos
+          </a>
+        </div>
+      </footer>
+    </div>
+
+    <CommandPalette />
+  </body>
+</html>

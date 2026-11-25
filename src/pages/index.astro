@@ -1,0 +1,190 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { formacion, profile, proyectos, skillGroups } from '../data/profile';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const proyectosDestacados = proyectos.filter((p) => p.destacado);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<BaseLayout>
+  <!-- Hero -->
+  <section class="space-y-5">
+    <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
+      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+      <span>{profile.estado}</span>
+    </div>
+
+    <div class="space-y-3">
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
+        {profile.nombre}
+      </h1>
+      <p class="font-mono text-sm text-emerald-400 sm:text-base">
+        {profile.rol}
+      </p>
+      <p class="max-w-2xl text-sm leading-relaxed text-zinc-400 sm:text-base">
+        {profile.descripcionCorta}
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3 pt-1">
+      <a
+        href={profile.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-100 transition hover:border-emerald-500/60 hover:text-emerald-300"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.69-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.14 0 1.54-.01 2.79-.01 3.17 0 .31.21.68.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+        </svg>
+        <span>GitHub</span>
+      </a>
+
+      <a
+        href="/proyectos"
+        class="inline-flex items-center rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-100"
+      >
+        Ver proyectos
+      </a>
+
+      <a
+        href="/blog"
+        class="inline-flex items-center rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-100"
+      >
+        Leer guías
+      </a>
+    </div>
+  </section>
+
+  <!-- Formación y Certificaciones -->
+  <section id="formacion" class="mt-16 space-y-6">
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold tracking-tight text-zinc-100">Formación y certificaciones</h2>
+      <span class="font-mono text-xs text-zinc-500">{profile.ubicacion}</span>
+    </div>
+
+    <div class="space-y-4">
+      {formacion.map((item) => (
+        <article class="rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-5 transition hover:border-zinc-700">
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h3 class="text-base font-medium text-zinc-100">{item.titulo}</h3>
+              <p class="text-sm text-zinc-400">
+                {item.centro}
+                {item.ubicacion ? ` · ${item.ubicacion}` : ''}
+              </p>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="font-mono text-zinc-400">{item.periodo}</span>
+              {item.estado && (
+                <span class="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-medium text-emerald-300">
+                  {item.estado}
+                </span>
+              )}
+            </div>
+          </div>
+          <p class="mt-3 text-sm leading-relaxed text-zinc-400">{item.descripcion}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Proyectos y Laboratorios -->
+  <section class="mt-16 space-y-6">
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold tracking-tight text-zinc-100">Proyectos y laboratorios</h2>
+      <a href="/proyectos" class="text-xs font-medium text-emerald-400 transition hover:text-emerald-300">
+        Ver todos →
+      </a>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      {proyectosDestacados.map((proyecto) => (
+        <article class="flex flex-col justify-between rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-5 transition hover:border-zinc-700">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-emerald-400">
+                {proyecto.categoria}
+              </span>
+              {proyecto.enlace && (
+                <a
+                  href={proyecto.enlace}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-xs text-zinc-500 transition hover:text-zinc-200"
+                >
+                  Repo ↗
+                </a>
+              )}
+            </div>
+            <h3 class="mt-2 text-base font-medium text-zinc-100">{proyecto.titulo}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-zinc-400">{proyecto.resumen}</p>
+          </div>
+
+          <ul class="mt-4 flex flex-wrap gap-1.5">
+            {proyecto.tecnologias.map((tech) => (
+              <li class="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-0.5 font-mono text-[11px] text-zinc-300">
+                {tech}
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Stack Técnico -->
+  <section id="stack" class="mt-16 space-y-6">
+    <h2 class="text-lg font-semibold tracking-tight text-zinc-100">Stack técnico</h2>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      {skillGroups.map((group) => (
+        <div class="rounded-xl border border-zinc-800/80 bg-zinc-900/30 p-4">
+          <h3 class="font-mono text-xs font-medium uppercase tracking-wider text-zinc-400">
+            {group.categoria}
+          </h3>
+          <ul class="mt-3 flex flex-wrap gap-1.5">
+            {group.items.map((skill) => (
+              <li class="rounded-md border border-zinc-800 bg-zinc-950 px-2.5 py-1 text-xs text-zinc-300">
+                {skill}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Últimos artículos del blog -->
+  <section class="mt-16 space-y-6">
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold tracking-tight text-zinc-100">Últimas guías del blog</h2>
+      <a href="/blog" class="text-xs font-medium text-emerald-400 transition hover:text-emerald-300">
+        Ir al blog →
+      </a>
+    </div>
+
+    <div class="divide-y divide-zinc-800/80 rounded-xl border border-zinc-800/80 bg-zinc-900/30">
+      {posts.map((post) => (
+        <a
+          href={`/blog/${post.id}`}
+          class="block p-5 transition hover:bg-zinc-900/70"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="text-base font-medium text-zinc-100">{post.data.title}</h3>
+            <time datetime={post.data.pubDate.toISOString()} class="font-mono text-xs text-zinc-500">
+              {formatDate(post.data.pubDate)}
+            </time>
+          </div>
+          <p class="mt-1.5 text-sm text-zinc-400">{post.data.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

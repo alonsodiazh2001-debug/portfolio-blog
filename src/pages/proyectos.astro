@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { profile, proyectos } from '../data/profile';
+
+const categorias = ['Todos', 'Ciberseguridad', 'Sistemas', 'Redes', 'Cloud y Docker', 'Web y BBDD'];
+---
+
+<BaseLayout
+  title={`Proyectos y Labs · ${profile.nombre}`}
+  description="Prácticas de administración de sistemas, redes, cloud, Docker, ciberseguridad y desarrollo web."
+>
+  <section class="space-y-3">
+    <h1 class="text-2xl font-bold tracking-tight text-zinc-50 sm:text-3xl">
+      Proyectos y laboratorios
+    </h1>
+    <p class="text-sm leading-relaxed text-zinc-400 sm:text-base">
+      Recopilación de prácticas técnicas y laboratorios desarrollados durante el ciclo de ASIR y formación en ciberseguridad.
+    </p>
+  </section>
+
+  <!-- Filtros -->
+  <div id="project-filters" class="mt-8 flex flex-wrap gap-2">
+    {categorias.map((cat, idx) => (
+      <button
+        type="button"
+        data-category={cat}
+        class:list={[
+          'filter-btn rounded-lg border px-3 py-1.5 text-xs font-medium transition cursor-pointer',
+          idx === 0
+            ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
+            : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200',
+        ]}
+      >
+        {cat}
+      </button>
+    ))}
+  </div>
+
+  <!-- Grid -->
+  <div id="projects-grid" class="mt-6 grid gap-4 sm:grid-cols-2">
+    {proyectos.map((proyecto) => (
+      <article
+        data-category={proyecto.categoria}
+        class="project-card flex flex-col justify-between rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-5 transition hover:border-zinc-700"
+      >
+        <div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-mono text-[11px] uppercase tracking-wider text-emerald-400">
+              {proyecto.categoria}
+            </span>
+            {proyecto.enlace && (
+              <a
+                href={proyecto.enlace}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-xs text-zinc-500 transition hover:text-zinc-200"
+              >
+                GitHub ↗
+              </a>
+            )}
+          </div>
+          <h2 class="mt-2 text-base font-medium text-zinc-100">{proyecto.titulo}</h2>
+          <p class="mt-2 text-sm leading-relaxed text-zinc-400">{proyecto.resumen}</p>
+        </div>
+
+        <ul class="mt-4 flex flex-wrap gap-1.5">
+          {proyecto.tecnologias.map((tech) => (
+            <li class="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-0.5 font-mono text-[11px] text-zinc-300">
+              {tech}
+            </li>
+          ))}
+        </ul>
+      </article>
+    ))}
+  </div>
+
+  <script is:inline>
+    (() => {
+      const buttons = Array.from(document.querySelectorAll('.filter-btn'));
+      const cards = Array.from(document.querySelectorAll('.project-card'));
+      if (!buttons.length || !cards.length) return;
+
+      const activeClasses = ['border-emerald-500/50', 'bg-emerald-500/15', 'text-emerald-300'];
+      const idleClasses = ['border-zinc-800', 'bg-zinc-900', 'text-zinc-400'];
+
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const selected = btn.dataset.category;
+          buttons.forEach((b) => {
+            const isSelected = b === btn;
+            activeClasses.forEach((c) => b.classList.toggle(c, isSelected));
+            idleClasses.forEach((c) => b.classList.toggle(c, !isSelected));
+          });
+
+          cards.forEach((card) => {
+            const show = selected === 'Todos' || card.dataset.category === selected;
+            card.classList.toggle('hidden', !show);
+          });
+        });
+      });
+    })();
+  </script>
+</BaseLayout>
